@@ -8,6 +8,10 @@ Due to a very short time for implementation I put all of the code into `game.js`
 
 The main concept of the game was randomly generated on the specialized website and it looks like this: "A tycoon game where you monetize livestock to score karma." So it's a simple 2D that is contained cells where you can move the main hero. The main goal is to collect as many cows as you can and to decrease your debt to zero while staying healthy.
 
+### Controls
+
+Arrow keys.
+
 ## Installation and running
 
 Clone the repo and open `index.html`.
