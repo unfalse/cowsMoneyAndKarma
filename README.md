@@ -18,4 +18,4 @@ Just the vanilla JS, HTML and CSS.
 
 ## Bugs and flaws
 
-There is no karma counter or other think linked with karma implemented actually.
+There is no karma counter or other thing linked with karma implemented actually.
