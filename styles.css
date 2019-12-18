@@ -1,0 +1,154 @@
+.game-cell {
+  width: 58px;
+  height: 58px;
+  border: 1px black solid;
+  display: inline-block;
+}
+
+.game-object {
+  /* border: 1px solid black; */
+  position: absolute;
+}
+
+.title {
+  font-weight: 400;
+  font-size: 40pt;
+  color: blue;
+}
+
+.buttons {
+  display: flex;
+}
+
+.help {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.block {
+  padding: 20px;
+  width: 150px;
+}
+
+.description {
+  border: 1px solid black;
+  margin: 30px;
+  display: flex;
+}
+
+.third-party {
+  border: 1px solid black;
+  margin: 30px;
+  display: flex;
+}
+
+.third-party .block {
+  padding: 20px;
+  width: 400px;
+}
+
+.third-party .block div {
+  padding: 5px;
+}
+
+.stats {
+  margin-top: 30px;
+}
+
+.pic {
+  height: 80px;
+  width: 80px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 20px;
+}
+
+.player {
+  background-image: url(img/player.png);
+}
+
+.cow {
+  background-image: url(img/cow.png);
+}
+
+.road {
+  background-image: url(img/road.png);
+}
+
+.collector {
+  background-image: url(img/collector.png);
+}
+
+.pill {
+  background-image: url(img/pill.png);
+}
+
+.creditpic {
+  background-image: url(img/credit.png);
+}
+
+.expenses {
+  background-image: url(img/expenses.png);
+}
+
+.gametarget {
+  padding: 10px;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: center;
+}
+
+#game-field {
+  /* width: 780px;
+    height: 360px; */
+  position: relative;
+  border: 1px solid black;
+}
+
+#start-button {
+  font-size: 30pt;
+  margin: 30pt;
+  padding: 10px;
+  border: 1px solid blue;
+  cursor: pointer;
+}
+
+#help-button {
+  font-size: 30pt;
+  margin: 30pt;
+  padding: 10px;
+  border: 1px solid blue;
+  cursor: pointer;
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+  width: 1054px;
+}
+
+.credit {
+  /* width: 16px;
+    height: 16px; */
+  background: url("img/credit.png") left center;
+  background-size: cover;
+  animation: playCredit 1.5s steps(8) infinite;
+  display: inline-block;
+}
+
+.label {
+  font-size: 24pt;
+  font-family: Arial;
+  font-weight: 400;
+}
+
+@keyframes playCredit {
+  100% {
+    background-position: -635px;
+  }
+}

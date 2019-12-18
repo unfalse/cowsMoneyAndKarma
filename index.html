@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <body>
+    <div id="root">
+        <div class="title">Cows, money and karma tycoon!</div>
+        <div class="buttons">
+          <a id="help-button" href="help.html">HELP!</a>
+          <div id="start-button">START</div>
+        </div>
+        <div class="labels">
+          <div class="cash-and-health label">
+            <div>Cash: $<span id="cash"></span></div>
+            <div>Health: <span id="health"></span></div>
+          </div>
+
+          <div class="debt label">
+            <div>Debt: $<span id="debt"></span></div>
+            <div>Monthly pay: $<span id="pay"></span></div>
+          </div>
+        
+          <div class="days label">
+              <div>Day: <span id="day"></span></div>
+              <div>Days before credit pay: <span id="payday"></span></div>
+          </div>
+        </div>
+        <div>
+          <div id="game-field"></div>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+  </body>
+</html>
