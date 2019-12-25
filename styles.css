@@ -1,3 +1,24 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+html {
+  background-color: #272424;
+  color: darkgray;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+a:visited {
+  color: darkgray;
+  text-decoration: none;
+}
+
 .game-cell {
   width: 58px;
   height: 58px;
@@ -23,6 +44,8 @@
 .help {
   display: flex;
   flex-wrap: wrap;
+  width: 1120px;
+  justify-content: space-between;
 }
 
 .block {
@@ -31,9 +54,37 @@
 }
 
 .description {
-  border: 1px solid black;
+  border: 1px solid #a9a9a9;
   margin: 30px;
   display: flex;
+  font-size: 8pt;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.text {
+  width: 390px;
+  display: flex;
+  font-size: larger;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.text-left {
+  justify-content: flex-start;
+  margin: 20px;
+}
+
+.link {
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.link:hover {
+  border-top: 1px solid darkgray;
+  border-bottom: 1px solid darkgray;
+  cursor: pointer;
 }
 
 .third-party {
@@ -60,6 +111,7 @@
   width: 80px;
   background-size: contain;
   background-repeat: no-repeat;
+  background-position-x: center;
   margin: 20px;
 }
 
@@ -108,14 +160,7 @@
     height: 360px; */
   position: relative;
   border: 1px solid black;
-}
-
-#start-button {
-  font-size: 30pt;
-  margin: 30pt;
-  padding: 10px;
-  border: 1px solid blue;
-  cursor: pointer;
+  background-color: #1d6132;
 }
 
 #help-button {
@@ -130,6 +175,9 @@
   display: flex;
   justify-content: space-between;
   width: 1054px;
+  font-size: small;
+  width: 312px;
+  text-transform: uppercase;
 }
 
 .credit {
@@ -141,14 +189,31 @@
   display: inline-block;
 }
 
+.credit-help {
+  background: url("img/credit.png") left center;
+  background-size: cover;
+  animation: playCreditHelp 1.5s steps(8) infinite;
+  display: inline-block;
+}
+
 .label {
-  font-size: 24pt;
   font-family: Arial;
   font-weight: 400;
 }
 
+.label-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+@keyframes playCreditHelp {
+  100% {
+    background-position: -639px;
+  }
+}
+
 @keyframes playCredit {
   100% {
-    background-position: -635px;
+    background-position: -239px;
   }
 }
