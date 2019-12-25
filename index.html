@@ -3,33 +3,214 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
-    <div id="root">
-        <div class="title">Cows, money and karma tycoon!</div>
-        <div class="buttons">
-          <a id="help-button" href="help.html">HELP!</a>
-          <div id="start-button">START</div>
-        </div>
-        <div class="labels">
-          <div class="cash-and-health label">
-            <div><div>Cash:</div><span id="cash"></span></div>
-            <div><div>Health:</div><span id="health"></span></div>
+    <!-- <a id="start-button" href="index.html">GO BACK</a> -->
+    <div class="help">
+      <div class="description">
+        <div class="pic player"></div>
+        <div class="block">
+          <div class="doc">
+            You must pay your bills and monetize as much livestock as you can to
+            score karma while trying to have no debts.
+            <span style="font-style: italic;">Remember: the time is your enemy!</span>
           </div>
+        </div>
+      </div>
 
-          <div class="debt label">
-            <div><div>Debt:</div> <span id="debt"></span></div>
-            <div><div>Pay:</div><span id="pay"></span></div>
+      <div class="description">
+        <div class="pic cow"></div>
+        <div class="block">
+          <div class="doc">
+            Cows give you money!
           </div>
-        
-          <div class="days label">
-              <div><div>Day:</div> <span id="day"></span></div>
-              <div><div>P.C.:</div><span id="payday"></span></div>
+          <div class="stats">
+            CASH: +$25
           </div>
         </div>
-        <div>
-          <div id="game-field"></div>
+      </div>
+
+      <div class="description">
+        <div class="pic road"></div>
+        <div class="block">
+          <div class="doc">
+            Sometimes to reach cows you have to pay for roads!
+          </div>
+          <div class="stats">
+            CASH: -$10
+          </div>
         </div>
+      </div>
+
+      <div class="description" style="margin-right: 0px; display: flex; justify-content: center;">
+        <div class="pic" style="background-image: url(img/pc_mouse.png);"></div>
+        <div class="pic" style="
+          background-image: url(img/keyboard_keys.png);
+          background-repeat: no-repeat;
+          background-size: contain;
+          width: 150px;
+        ">
+        </div>
+      </div>
+
+      <div class="description" id="start-window" style="margin: 0px; height: 212px;">
+        <div class="text">
+          <div style="font-size: large;">
+            COWS MONEY AND KARMA TYCOON!
+          </div>
+          <div class="link" id="start-button">
+            START
+          </div>
+          <div class="link" id="acknowledgment-button">
+            ACKNOWLEDGMENT
+          </div>
+          <div>
+            © 2019, <a href="https://twitter.com/unfalse_" target="_blank">unfalse</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="description" id="acknowledgment-window" style="margin: 0px; height: 212px;display: none;">
+        <div class="text">
+          <div style="font-size: large;">
+            Third party resources used in this game
+          </div>
+          <div class="text-left">
+            <div>A strange guy by <a href="https://opengameart.org/content/strange-guy">Buch</a></div>
+            <div>Bridge by <a href="https://opengameart.org/content/bridge-bleeds-game-art">Bleed</a></div>
+            <div>Pills and a brick from survival props pack by <a href="https://opengameart.org/content/free-survival-props-pack">Olga Bikmullina</a></div>
+            <div>A cow by <a href="https://opengameart.org/content/miscellaneous-2d-game-assets">Jeremy Woods</a></div>
+            <div>Grumpy Bee by <a href="https://opengameart.org/content/grumpy-bee-enemy-game-character">bevouliin.com</a></div>
+            <div>Rotating coin animation by <a href="https://opengameart.org/content/rotating-coin">Puddin</a></div>
+            <div>PC mouse and keyboard from <a href="https://www.cleanpng.com/">CleanPNG</a></div>
+          </div>
+          <div class="link back_to_start">
+            &lt;&lt; GO BACK TO START SCREEN
+          </div>
+        </div>
+      </div>
+
+      <div class="description" id="results-window" style="margin: 0px; height: 212px;display: none;">
+        <div class="text">
+          <div style="font-size: large;">
+            GAME OVER!
+          </div>
+          <div id="stats_days"></div>
+          <div id="stats_cows"></div>
+          <div id="stats_roads"></div>
+          <div id="stats_expenses"></div>
+          <div id="stats_credits"></div>
+          <div id="stats_collectors"></div>
+          <div id="stats_pills"></div>
+          <div id="stats_debts_closed"></div>
+          <div id="stats_debts_failed"></div>
+          <div id="stats_karma_level"></div>
+          <div class="link back_to_start">
+            &lt;&lt; GO BACK TO START SCREEN
+          </div>
+        </div>
+
+      </div>
+
+      <div
+        class="description"
+        id="game-window"
+        style="margin: 0px; display: none;"
+      >
+        <div id="root">
+          <div class="labels">
+            <div class="cash-and-health label">
+              <div class="label-wrapper">
+                <div>Cash:</div>
+                <span id="cash"></span>
+              </div>
+              <div class="label-wrapper">
+                <div>Health:</div>
+                <span id="health"></span>
+              </div>
+            </div>
+
+            <div class="debt label">
+              <div class="label-wrapper">
+                <div>Debt:</div>
+                <span id="debt"></span>
+              </div>
+              <div class="label-wrapper">
+                <div>Pay:</div>
+                <span id="pay"></span>
+              </div>
+            </div>
+
+            <div class="days label">
+              <div class="label-wrapper">
+                <div>Day:</div>
+                <span id="day"></span>
+              </div>
+              <div class="label-wrapper">
+                <div>P.C.:</div>
+                <span id="payday"></span>
+              </div>
+            </div>
+
+          </div>
+          <div>
+            <div id="game-field"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="description" style="margin-left: 0px;">
+        <div class="pic expenses"></div>
+        <div class="block">
+          <div class="doc">
+            Misc. expenses!
+          </div>
+          <div class="stats">
+            CASH: -$30
+          </div>
+        </div>
+      </div>
+
+      <div class="description">
+        <div class="pic credit-help"></div>
+        <div class="block">
+          <div class="doc">
+            You can take another credit when you out of money! Credits appear
+            only when you out of money.
+          </div>
+          <div class="stats">
+            <div>CASH: +$500</div>
+            <div>DEBT: +$500</div>
+            <div>MONTHLY PAY: + $50</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="description">
+        <div class="pic collector"></div>
+        <div class="block">
+          <div class="doc">
+            Collectors appears when you have no money to pay your bills!
+          </div>
+          <div class="stats">
+            <div>CASH: -$30</div>
+            <div>HEALTH: -10</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="description">
+        <div class="pic pill"></div>
+        <div class="block">
+          <div class="doc">
+            Sometimes you need to improve your health!
+          </div>
+          <div class="stats">
+            <div>CASH: -$50</div>
+            <div>HEALTH: +10</div>
+          </div>
+        </div>
+      </div>
     </div>
-    
+
     <script type="text/javascript" src="utils.js"></script>
     <script type="text/javascript" src="game.js"></script>
   </body>
