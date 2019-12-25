@@ -31,38 +31,14 @@
   const PILLprice = 50;
   const PILLheals = 10;
   const CREDITdebt = 500;
-  const CREDITpay = 50;
+  const CREDITpay = 250;
   const EXPENSEScost = 30;
 
-  // first 20 sec only cows
-  // next 20 sec some roads
-  // next 20 sec more roads
-  // next 20 sec more cows
-  // next 20 sec add pills
-  // const genPlan = [
-  //   [1, COW],
-  //   [20, COW],
-  //   [40, ROAD],
-  //   [60, ROAD],
-  //   [80, COW],
-  //   [90, CREDIT],
-  //   [100, PILL],
-  //   [120, COW],
-  //   [140, ROAD],
-  //   [150, CREDIT],
-  //   [160, ROAD],
-  //   [190, COW],
-  //   [200, CREDIT],
-  //   [210, PILL]
-  // ];
   const genPlan = [
     [1, ROAD],
     [30, EXPENSES],
-    //    [60, PILL],
     [60, ROAD],
-    //    [90, PILL],
     [90, EXPENSES]
-    //    [120, PILL]
   ];
   let currentPhase = 0;
   let startingTimeForPhase = 0;
@@ -70,16 +46,13 @@
     move: false,
     dir: { x: 0, y: 0 }
   };
-  let player = {
-    cash: 1000,
-    debt: 800,
-    health: 100,
-    monthlyPay: 100,
-    screenObj: null
-  };
+  let player = {};
   let gameObjects = [];
   let moneyChangeMultiplier = 1;
   let gameOverFlag = false;
+  let player_stands_still = 0;
+  let currentTickNumber = 0;
+  let lastTickNumberPlayerMoved = 0;
 
   const cashEl = document.getElementById("cash");
   const debtEl = document.getElementById("debt");
@@ -108,17 +81,15 @@
   init();
 
   startBtn.onclick = function() {
-    // startBtn.style.visibility = "hidden";
     startWindow.style.display = "none";
     gameWindow.style.display = "block";
-    mainTimer = setTimeout(gameLoop, 1000);
-    // playerTimer = setInterval(playerLoop, 90);
+    gameLoop();
   };
 
   ackButton.onclick = function() {
     startWindow.style.display = "none";
     ackWindow.style.display = "block";
-  }
+  };
 
   backToStart[0].onclick = function() {
     window.location.reload();
@@ -132,7 +103,19 @@
     if (player.health <= 0) {
       gameOver();
     }
+    if (
+      stats.cows > 0 &&
+      stats.debts_closed > 0 &&
+      stats.debts_failed === 0 &&
+      stats.credits === 0 &&
+      player.debt === 0
+    ) {
+      gameOver();
+    }
     if (player.cash > 0) {
+      if (currentTickNumber - lastTickNumberPlayerMoved >= 5) {
+        player.cash -= 20;
+      }
       player.cash -= 1;
     }
     if (player.cash <= 0) {
@@ -145,23 +128,9 @@
       addObject(PILL, 2, 0);
     }
 
-    // do things...
-    // if (totalDaysCounter % 2 === 0) {
-    // addPlannedObjects(COW);
     addPlannedObjects(ROAD);
-    // addPlannedObjects(PILL);
-    // addPlannedObjects(CREDIT);
     addPlannedObjects(EXPENSES);
-    //}
-
-    //if (totalDaysCounter % 2 === 0) {
-    // TODO: every cow need 1 or 2 roads
-    // or 1 expenses
-    // player have roads and expenses storage
-    // when he takes a cow he lose collected roads and expenses
-    // exactly how many a cow needs !
     addObject(COW, 1, 0);
-    //}
 
     showCashAndDebt();
     returnDebt();
@@ -174,11 +143,11 @@
       daysCounter = 1;
       removeObjects();
     }
-    // every second is a day
     if (!gameOverFlag) {
       // TODO: decide what to do so player will not stay still
       mainTimer = setTimeout(gameLoop, ONE_GAME_TICK);
     }
+    currentTickNumber++;
   }
 
   function removeObjects() {
@@ -224,11 +193,13 @@
     gameObject.div.parentNode.removeChild(gameObject.div);
   }
 
-  function playerLoop() {
-    // if (config.move) {
+  function playerTick() {
     const newX = player.x + config.dir.x;
     const newY = player.y + config.dir.y;
-    if (newX >= 0 && newX < MAXX && newY >= 0 && newY <= MAXY - 1) {
+    if (
+      (newX !== player.x || newY !== player.y) &&
+      newX >= 0 && newX < MAXX && newY >= 0 && newY <= MAXY - 1
+    ) {
       const objType = getObjectAtCoords({ x: newX, y: newY });
       if (!canMove(objType)) {
         return;
@@ -282,8 +253,9 @@
       player.screenObj.div.style.top = player.y * CELLSIZE + "px";
 
       showCashAndDebt();
+      // console.log(currentTickNumber);
+      lastTickNumberPlayerMoved = currentTickNumber;
     }
-    // }
   }
 
   function canMove(type) {
@@ -314,8 +286,6 @@
     gameOverFlag = true;
     clearInterval(playerTimer);
     clearTimeout(mainTimer);
-    // startBtn.innerText = "GAME OVER. RESTART?";
-    // startBtn.style.visibility = "visible";
     gameWindow.style.display = "none";
     resultsWindow.style.display = "block";
     stats.days = totalDaysCounter;
@@ -332,35 +302,36 @@
   }
 
   function showKarma() {
-
-    /* TODO: this stats hadn't meet any condition!
-    DAYS: 48
-COWS: 1
-ROADS: 51
-EXPENSES: 5
-CREDITS: 0
-COLLECTORS: 0
-PILLS: 0
-DEBTS CLOSED: 1
-DEBTS FAILED: 0
-*/
-
     const conditions = [
-      stats.cows === 0 && stats.debts_closed > 0 && stats.roads === 0,
+      stats.cows === 0 && stats.debts_closed >= 0 && stats.roads === 0,
       stats.cows === 0 && (stats.roads > 0 || stats.expenses > 0),
-      stats.cows > 0 && stats.debts_failed > stats.debts_closed && stats.credits > 0,
-      stats.cows > 0 && stats.debts_closed > stats.debts_failed && player.debt > 0 && stats.credits === 0,
-      stats.cows > 0 && stats.debts_failed === 0 && stats.credits === 0 && player.debt === 0
+      stats.cows > 0 && player.debt > 0 && stats.credits >= 0,
+      stats.cows > 0 && player.debt === 0 && stats.credits > 0,
+      stats.cows > 0 &&
+        stats.debts_closed > 0 &&
+        stats.debts_failed === 0 &&
+        stats.credits === 0 &&
+        player.debt === 0
     ];
-    const desc = document.createElement('span');
-    desc.innerText = 'KARMA: ';
+    const desc = document.createElement("span");
+    desc.innerText = "KARMA: ";
     karmaEl.appendChild(desc);
-    for(let cnt = 0; cnt < KARMA_LEVELS.length; cnt++) {
-      const span = document.createElement('span');
+
+    const notInConditions = conditions.every(b => false);
+
+    for (let cnt = 0; cnt < KARMA_LEVELS.length; cnt++) {
+      const span = document.createElement("span");
       span.innerText = KARMA_LEVELS[cnt];
-      span.style.color = conditions[cnt] ? 'rgb(0, 255, 8)' : '#000';
-      span.style.marginLeft = '5px';
-      span.style.marginRight = '5px';
+      if (!notInConditions) {
+        span.style.color = conditions[cnt] ? "rgb(0, 255, 8)" : "#000";
+      } else {
+        if (cnt === 0) {
+          span.style.color = "rgb(0, 255, 8)";
+        }
+      }
+      span.style.color = conditions[cnt] ? "rgb(0, 255, 8)" : "#000";
+      span.style.marginLeft = "5px";
+      span.style.marginRight = "5px";
       karmaEl.appendChild(span);
     }
   }
@@ -436,10 +407,11 @@ DEBTS FAILED: 0
     currentPhase = 0;
     startingTimeForPhase = 0;
     player = {
-      cash: 1000,
-      debt: 800,
+      cash: 400,
+      debt: 400,
       health: 100,
-      monthlyPay: 100
+      monthlyPay: 100,
+      screenObj: null
     };
     gameObjects = [];
     moneyChangeMultiplier = 1;
@@ -507,11 +479,6 @@ DEBTS FAILED: 0
     if (type !== COW) {
       addObject(type, 4);
     }
-    // if (type === COW) {
-    //     addObject(type, 2, 0);
-    // } else {
-    //     addObject(type, 6);
-    // }
   }
 
   function keysHandler(event) {
@@ -540,6 +507,6 @@ DEBTS FAILED: 0
     if (event.type == "keyup") {
       this.move = false;
     }
-    playerLoop();
+    playerTick();
   }
 })();
