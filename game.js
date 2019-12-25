@@ -1,4 +1,18 @@
 (function() {
+  const ONE_GAME_TICK = 650;
+  const KARMA_LEVELS = ["NOTHING", "BAD", "AVERAGE", "GOOD", "BUDDA"];
+  const stats = {
+    days: 0,
+    cows: 0,
+    roads: 0,
+    expenses: 0,
+    credits: 0,
+    collectors: 0,
+    pills: 0,
+    debts_closed: 0,
+    debts_failed: 0
+  };
+
   const COW = "cow";
   const ROAD = "road";
   const COLLECTOR = "collector";
@@ -8,7 +22,7 @@
   const EXPENSES = "expenses";
   const MAXX = 13;
   const MAXY = 6;
-  const CELLSIZE = 80;
+  const CELLSIZE = 30;
 
   const ROADprice = 10;
   const COWreward = 25;
@@ -67,7 +81,6 @@
   let moneyChangeMultiplier = 1;
   let gameOverFlag = false;
 
-  const rootEl = document.getElementById("root");
   const cashEl = document.getElementById("cash");
   const debtEl = document.getElementById("debt");
   const payEl = document.getElementById("pay");
@@ -76,6 +89,13 @@
   const paydayEl = document.getElementById("payday");
   const startBtn = document.getElementById("start-button");
   const gameFieldEl = document.getElementById("game-field");
+  const startWindow = document.getElementById("start-window");
+  const gameWindow = document.getElementById("game-window");
+  const resultsWindow = document.getElementById("results-window");
+  const ackWindow = document.getElementById("acknowledgment-window");
+  const backToStart = document.getElementsByClassName("back_to_start");
+  const ackButton = document.getElementById("acknowledgment-button");
+  const karmaEl = document.getElementById("stats_karma_level");
 
   let mainTimer = null;
   let playerTimer = null;
@@ -88,9 +108,24 @@
   init();
 
   startBtn.onclick = function() {
-    startBtn.style.visibility = "hidden";
+    // startBtn.style.visibility = "hidden";
+    startWindow.style.display = "none";
+    gameWindow.style.display = "block";
     mainTimer = setTimeout(gameLoop, 1000);
     // playerTimer = setInterval(playerLoop, 90);
+  };
+
+  ackButton.onclick = function() {
+    startWindow.style.display = "none";
+    ackWindow.style.display = "block";
+  }
+
+  backToStart[0].onclick = function() {
+    window.location.reload();
+  };
+
+  backToStart[1].onclick = function() {
+    window.location.reload();
   };
 
   function gameLoop() {
@@ -101,7 +136,7 @@
       player.cash -= 1;
     }
     if (player.cash <= 0) {
-      player.health--;
+      player.health -= 10;
     }
     if (player.cash <= 150 || player.cash <= 0) {
       addObject(CREDIT, 1, 0);
@@ -142,7 +177,7 @@
     // every second is a day
     if (!gameOverFlag) {
       // TODO: decide what to do so player will not stay still
-      mainTimer = setTimeout(gameLoop, 650);
+      mainTimer = setTimeout(gameLoop, ONE_GAME_TICK);
     }
   }
 
@@ -204,16 +239,20 @@
       switch (objType) {
         case COW:
           player.cash += COWreward;
+          stats.cows++;
           break;
         case ROAD:
           player.cash -= ROADprice;
+          stats.roads++;
           break;
         case COLLECTOR:
           player.cash -= COLLECTORtakes;
           player.health -= COLLECTORbites;
+          stats.collectors++;
           break;
         case PILL:
           player.cash -= PILLprice;
+          stats.pills++;
           if (player.health < 100) {
             player.health += PILLheals;
             if (player.health > 100) {
@@ -225,9 +264,11 @@
           player.cash += CREDITdebt;
           player.debt += CREDITdebt;
           player.monthlyPay += CREDITpay;
+          stats.credits++;
           break;
         case EXPENSES:
           player.cash -= EXPENSEScost;
+          stats.expenses++;
         default:
           break;
       }
@@ -273,8 +314,55 @@
     gameOverFlag = true;
     clearInterval(playerTimer);
     clearTimeout(mainTimer);
-    startBtn.innerText = "GAME OVER. RESTART?";
-    startBtn.style.visibility = "visible";
+    // startBtn.innerText = "GAME OVER. RESTART?";
+    // startBtn.style.visibility = "visible";
+    gameWindow.style.display = "none";
+    resultsWindow.style.display = "block";
+    stats.days = totalDaysCounter;
+    showStats();
+    showKarma();
+  }
+
+  function showStats() {
+    Object.keys(stats).map(key => {
+      var statsKey = document.getElementById(`stats_${key}`);
+      statsKey.innerText =
+        key.replace("_", " ").toUpperCase() + ": " + stats[key];
+    });
+  }
+
+  function showKarma() {
+
+    /* TODO: this stats hadn't meet any condition!
+    DAYS: 48
+COWS: 1
+ROADS: 51
+EXPENSES: 5
+CREDITS: 0
+COLLECTORS: 0
+PILLS: 0
+DEBTS CLOSED: 1
+DEBTS FAILED: 0
+*/
+
+    const conditions = [
+      stats.cows === 0 && stats.debts_closed > 0 && stats.roads === 0,
+      stats.cows === 0 && (stats.roads > 0 || stats.expenses > 0),
+      stats.cows > 0 && stats.debts_failed > stats.debts_closed && stats.credits > 0,
+      stats.cows > 0 && stats.debts_closed > stats.debts_failed && player.debt > 0 && stats.credits === 0,
+      stats.cows > 0 && stats.debts_failed === 0 && stats.credits === 0 && player.debt === 0
+    ];
+    const desc = document.createElement('span');
+    desc.innerText = 'KARMA: ';
+    karmaEl.appendChild(desc);
+    for(let cnt = 0; cnt < KARMA_LEVELS.length; cnt++) {
+      const span = document.createElement('span');
+      span.innerText = KARMA_LEVELS[cnt];
+      span.style.color = conditions[cnt] ? 'rgb(0, 255, 8)' : '#000';
+      span.style.marginLeft = '5px';
+      span.style.marginRight = '5px';
+      karmaEl.appendChild(span);
+    }
   }
 
   function ScreenObject(x, y, type, text = "") {
@@ -367,10 +455,12 @@
     if (daysCounter === 30 && player.debt > 0) {
       if (player.cash < player.monthlyPay) {
         addCollectors();
+        stats.debts_failed++;
       }
-      if (player.cash > player.monthlyPay) {
+      if (player.cash >= player.monthlyPay) {
         player.cash -= player.monthlyPay;
         player.debt -= player.monthlyPay;
+        stats.debts_closed++;
       }
       if (player.debt < 0) {
         player.cash += -player.debt;
@@ -390,9 +480,9 @@
   }
 
   function showCashAndDebt() {
-    cashEl.innerText = player.cash;
-    debtEl.innerText = player.debt;
-    payEl.innerText = player.monthlyPay;
+    cashEl.innerText = "$" + player.cash;
+    debtEl.innerText = "$" + player.debt;
+    payEl.innerText = "$" + player.monthlyPay;
     healthEl.innerText = player.health;
     dayEl.innerText = totalDaysCounter;
     paydayEl.innerText = 30 - daysCounter;
@@ -425,6 +515,7 @@
   }
 
   function keysHandler(event) {
+    if (gameOverFlag) return;
     if (event.type == "keydown") {
       switch (event.keyCode) {
         case Utils.KEY_CODE.LEFT:
