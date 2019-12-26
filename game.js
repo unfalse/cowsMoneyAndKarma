@@ -31,7 +31,7 @@
   const PILLprice = 50;
   const PILLheals = 10;
   const CREDITdebt = 500;
-  const CREDITpay = 250;
+  const CREDITpay = 125;
   const EXPENSEScost = 30;
 
   const genPlan = [
@@ -60,6 +60,7 @@
   const healthEl = document.getElementById("health");
   const dayEl = document.getElementById("day");
   const paydayEl = document.getElementById("payday");
+  const reason = document.getElementById("reason");
   const startBtn = document.getElementById("start-button");
   const gameFieldEl = document.getElementById("game-field");
   const startWindow = document.getElementById("start-window");
@@ -113,15 +114,15 @@
       gameOver();
     }
     if (player.cash > 0) {
-      if (currentTickNumber - lastTickNumberPlayerMoved >= 5) {
-        player.cash -= 20;
+      if (currentTickNumber - lastTickNumberPlayerMoved >= 6) {
+        player.cash -= 10;
       }
       player.cash -= 1;
     }
     if (player.cash <= 0) {
       player.health -= 10;
     }
-    if (player.cash <= 150 || player.cash <= 0) {
+    if (player.cash <= player.monthlyPay || player.cash <= 0) {
       addObject(CREDIT, 1, 0);
     }
     if (player.health < 100) {
@@ -253,7 +254,6 @@
       player.screenObj.div.style.top = player.y * CELLSIZE + "px";
 
       showCashAndDebt();
-      // console.log(currentTickNumber);
       lastTickNumberPlayerMoved = currentTickNumber;
     }
   }
@@ -289,8 +289,23 @@
     gameWindow.style.display = "none";
     resultsWindow.style.display = "block";
     stats.days = totalDaysCounter;
+    showReason();
     showStats();
     showKarma();
+  }
+
+  function showReason() {
+    let result = '';
+    if (player.health <= 0 && player.debt > 0) {
+      result = 'YOU DIED!';
+    }
+    if (player.health <= 0 && player.debt <= 0) {
+      result = 'YOU DIED BUT REPAID ALL LOANS!';
+    }
+    if (player.health >= 0 && player.debt <= 0) {
+      result = 'YOU REPAID ALL LOANS!';
+    }
+    reason.innerText = result;
   }
 
   function showStats() {
@@ -323,13 +338,12 @@
       const span = document.createElement("span");
       span.innerText = KARMA_LEVELS[cnt];
       if (!notInConditions) {
-        span.style.color = conditions[cnt] ? "rgb(0, 255, 8)" : "#000";
+        span.style.color = conditions[cnt] ? "#fff" : "#000";
       } else {
         if (cnt === 0) {
-          span.style.color = "rgb(0, 255, 8)";
+          span.style.color = "#fff";
         }
       }
-      span.style.color = conditions[cnt] ? "rgb(0, 255, 8)" : "#000";
       span.style.marginLeft = "5px";
       span.style.marginRight = "5px";
       karmaEl.appendChild(span);
@@ -416,9 +430,7 @@
     gameObjects = [];
     moneyChangeMultiplier = 1;
     gameOverFlag = false;
-    // createGameField();
     document.addEventListener("keydown", keysHandler.bind(config));
-    //document.addEventListener("keyup", keysHandler.bind(config));
     createPlayer();
     showCashAndDebt();
   }
@@ -432,6 +444,9 @@
       if (player.cash >= player.monthlyPay) {
         player.cash -= player.monthlyPay;
         player.debt -= player.monthlyPay;
+        if (player.debt > 0 && player.debt < player.monthlyPay) {
+          player.debt = player.monthlyPay;
+        }
         stats.debts_closed++;
       }
       if (player.debt < 0) {
@@ -445,7 +460,7 @@
   }
 
   function addCollectors() {
-    const howMany = Utils.getRandomInt(1, 25);
+    const howMany = Utils.getRandomInt(1, 15);
     for (var i = 0; i < howMany; i++) {
       createObj(COLLECTOR, true);
     }
@@ -476,8 +491,12 @@
 
   function addPlannedObjects(type) {
     if (genPlan[currentPhase][1] !== type) return;
-    if (type !== COW) {
-      addObject(type, 4);
+    if (type === EXPENSES) {
+      addObject(type, 2);
+    } else {
+      if (type !== COW) {
+        addObject(type, 4);
+      }
     }
   }
 
