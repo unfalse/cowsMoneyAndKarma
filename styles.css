@@ -27,7 +27,6 @@ a:visited {
 }
 
 .game-object {
-  /* border: 1px solid black; */
   position: absolute;
 }
 
@@ -181,8 +180,6 @@ a:visited {
 }
 
 .credit {
-  /* width: 16px;
-    height: 16px; */
   background: url("img/credit.png") left center;
   background-size: cover;
   animation: playCredit 1.5s steps(8) infinite;
