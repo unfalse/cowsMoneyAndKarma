@@ -14,12 +14,15 @@ Arrow keys.
 
 ## Installation and running
 
-Clone the repo and open `index.html`.
+Production minified build:
+```
+yarn
+yarn build
+```
+Open `dist\index.html`
+
+For development build open `src\index.html`
 
 ## Technologies used
 
 Just the vanilla JS, HTML and CSS.
-
-## Bugs and flaws
-
-There is no karma counter or other thing linked with karma implemented actually.
