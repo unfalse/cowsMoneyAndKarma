@@ -1,4 +1,4 @@
-# Cows Money And Karma
+# Cows Money And Karma Tycoon
 
 A game which I wrote in two days while participating in [KrassJAM](https://itch.io/jam/krassjam11). It's the kind of a hackathon which ran from November 29th to December 2nd.
 
