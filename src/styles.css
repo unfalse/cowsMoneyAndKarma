@@ -193,6 +193,11 @@ a:visited {
   display: inline-block;
 }
 
+#scrolling-credits {
+  overflow: hidden;
+  height: 100px;
+}
+
 .label {
   font-family: Arial;
   font-weight: 400;
