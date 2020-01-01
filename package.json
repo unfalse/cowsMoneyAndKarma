@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {},
   "scripts": {
-    "build": "cpx \"src/*.{html,css}\" \"dist/\" && cpx \"src/img/*\" \"dist/img/\" && minify src -d dist --mangle"
+    "build": "cpx \"src/*.{html,css}\" \"dist/\" && cpx \"src/img/*\" \"dist/img/\" && cpx \"src/sound/*\" \"dist/sound/\" && minify src -d dist --mangle"
   },
   "devDependencies": {
     "babel-minify": "^0.5.1",

@@ -1,4 +1,50 @@
 (function() {
+  const MAX_SLOTS = 10;
+  const MultiAudio = function(path) {
+    const slots = [];
+    for (let s = 0; s < MAX_SLOTS; s++) {
+      slots[s] = new Audio(path);
+      slots[s].stopped = true;
+      slots[s].onplay = function() { slots[s].stopped = false; }
+      slots[s].onended = function() { slots[s].stopped = true; }
+      slots[s].volume = 0.2;
+    }
+    const play = function() {
+      let s = 0;
+      while (!slots[s].stopped) ++s;
+      if (s < MAX_SLOTS) slots[s].play();
+    };
+    // return slots[0];
+    return {
+      play
+    };
+  };
+
+  // TODO: make sound play for EVERY item taken:
+  const SOUND_HEAL = new MultiAudio("sound/heal.wav");
+  const SOUND_CREDIT_TAKEN = new MultiAudio("sound/credit-taken.mp3");
+  const SOUND_EXPENSE_TAKEN = new MultiAudio("sound/expense-taken.mp3");
+  const SOUND_COW_PICKUP = new MultiAudio("sound/cow-pickup.mp3");
+  const SOUND_EXPLOSION = new MultiAudio("sound/explosion.mp3");
+  const SOUND_SEE_ACKNOWLEDGE = new MultiAudio("sound/confirm.mp3");
+  const SOUND_MENU_SELECT = new MultiAudio("sound/navigate-01.wav");
+
+  const SOUND_BACKGROUND_MUSIC = new Audio("sound/chase.wav");
+  SOUND_BACKGROUND_MUSIC.loop = true;
+  SOUND_BACKGROUND_MUSIC.volume = 0.5;
+
+  const SOUND_GAMEOVER = new Audio("sound/gameover.mp3");
+  SOUND_GAMEOVER.volume = 0.2;
+
+  const SOUND_ADVANCE = new Audio("sound/advance.mp3");
+  SOUND_ADVANCE.volume = 0.2;
+
+  const SOUND_BUDDA = new Audio('sound/budda.wav');
+  SOUND_BUDDA.volume = 0.5;
+
+  const SOUND_GOOD = new Audio('sound/good.wav');
+  SOUND_GOOD.volume = 0.5;
+
   const ONE_GAME_TICK = 650;
   const KARMA_LEVELS = ["NOTHING", "BAD", "AVERAGE", "GOOD", "BUDDA"];
   const stats = {
@@ -23,6 +69,7 @@
   const MAXX = 13;
   const MAXY = 6;
   const CELLSIZE = 30;
+  const MAX_CREDITS = 5;
 
   const ROADprice = 10;
   const COWreward = 25;
@@ -30,7 +77,7 @@
   const COLLECTORbites = 10;
   const PILLprice = 50;
   const PILLheals = 10;
-  const CREDITdebt = 500;
+  const CREDITdebt = 375;
   const CREDITpay = 125;
   const EXPENSEScost = 30;
 
@@ -53,6 +100,7 @@
   let player_stands_still = 0;
   let currentTickNumber = 0;
   let lastTickNumberPlayerMoved = 0;
+  let scrollCreditsTimerId = -1;
 
   const cashEl = document.getElementById("cash");
   const debtEl = document.getElementById("debt");
@@ -70,6 +118,8 @@
   const backToStart = document.getElementsByClassName("back_to_start");
   const ackButton = document.getElementById("acknowledgment-button");
   const karmaEl = document.getElementById("stats_karma_level");
+  const maxCreditsEl = document.getElementById("max-credits");
+  const scrollingCreditsEl = document.getElementById("scrolling-credits");
 
   let mainTimer = null;
   let playerTimer = null;
@@ -79,25 +129,64 @@
   gameFieldEl.style.width = MAXX * CELLSIZE + "px";
   gameFieldEl.style.height = MAXY * CELLSIZE + "px";
 
-  init();
+  maxCreditsEl.innerText = MAX_CREDITS;
+
+  init()
 
   startBtn.onclick = function() {
-    startWindow.style.display = "none";
-    gameWindow.style.display = "block";
-    gameLoop();
+    SOUND_MENU_SELECT.play();
+    setTimeout(() => {
+      startWindow.style.display = "none";
+      gameWindow.style.display = "block";
+      SOUND_BACKGROUND_MUSIC.play();
+      gameLoop();
+    }, 500);
+  };
+
+  const scrollCredits = () => {
+    scrollCreditsTimerId = setTimeout(() => {
+      const { scrollHeight, clientHeight } = scrollingCreditsEl;
+      if (scrollingCreditsEl.scrollTop < scrollHeight - clientHeight) {
+        scrollingCreditsEl.scrollTop++;
+      } else {
+        scrollingCreditsEl.scrollTop = 0;
+      }
+      scrollCredits();
+    }, 30);
   };
 
   ackButton.onclick = function() {
+    SOUND_SEE_ACKNOWLEDGE.play();
     startWindow.style.display = "none";
     ackWindow.style.display = "block";
+    scrollCredits();
   };
 
+  scrollingCreditsEl.onscroll = function(ev) {
+    
+  }
+
+  scrollingCreditsEl.onclick = function() {
+    if (scrollCreditsTimerId !== null) {
+      clearTimeout(scrollCreditsTimerId);
+      scrollCreditsTimerId = null;
+    } else {
+      scrollCredits();
+    }
+  }
+
   backToStart[0].onclick = function() {
-    window.location.reload();
+    SOUND_MENU_SELECT.play();
+    setTimeout(() => {
+      window.location.reload();
+    }, 300);
   };
 
   backToStart[1].onclick = function() {
-    window.location.reload();
+    SOUND_MENU_SELECT.play();
+    setTimeout(() => {
+      window.location.reload();
+    }, 300);
   };
 
   function gameLoop() {
@@ -123,7 +212,9 @@
       player.health -= 10;
     }
     if (player.cash <= player.monthlyPay || player.cash <= 0) {
-      addObject(CREDIT, 1, 0);
+      if (stats.credits < MAX_CREDITS) {
+        addObject(CREDIT, 1, 0);
+      }
     }
     if (player.health < 100) {
       addObject(PILL, 2, 0);
@@ -199,7 +290,10 @@
     const newY = player.y + config.dir.y;
     if (
       (newX !== player.x || newY !== player.y) &&
-      newX >= 0 && newX < MAXX && newY >= 0 && newY <= MAXY - 1
+      newX >= 0 &&
+      newX < MAXX &&
+      newY >= 0 &&
+      newY <= MAXY - 1
     ) {
       const objType = getObjectAtCoords({ x: newX, y: newY });
       if (!canMove(objType)) {
@@ -210,19 +304,23 @@
       }
       switch (objType) {
         case COW:
+          SOUND_COW_PICKUP.play();
           player.cash += COWreward;
           stats.cows++;
           break;
         case ROAD:
+          SOUND_EXPENSE_TAKEN.play();
           player.cash -= ROADprice;
           stats.roads++;
           break;
         case COLLECTOR:
+          SOUND_EXPLOSION.play();
           player.cash -= COLLECTORtakes;
           player.health -= COLLECTORbites;
           stats.collectors++;
           break;
         case PILL:
+          SOUND_HEAL.play();
           player.cash -= PILLprice;
           stats.pills++;
           if (player.health < 100) {
@@ -233,12 +331,14 @@
           }
           break;
         case CREDIT:
+          SOUND_CREDIT_TAKEN.play();
           player.cash += CREDITdebt;
           player.debt += CREDITdebt;
           player.monthlyPay += CREDITpay;
           stats.credits++;
           break;
         case EXPENSES:
+          SOUND_EXPENSE_TAKEN.play();
           player.cash -= EXPENSEScost;
           stats.expenses++;
         default:
@@ -283,6 +383,8 @@
   }
 
   function gameOver() {
+    SOUND_BACKGROUND_MUSIC.pause();
+    SOUND_ADVANCE.pause();
     gameOverFlag = true;
     clearInterval(playerTimer);
     clearTimeout(mainTimer);
@@ -295,15 +397,15 @@
   }
 
   function showReason() {
-    let result = '';
+    let result = "";
     if (player.health <= 0 && player.debt > 0) {
-      result = 'YOU DIED!';
+      result = "YOU DIED!";
     }
     if (player.health <= 0 && player.debt <= 0) {
-      result = 'YOU DIED BUT REPAID ALL LOANS!';
+      result = "YOU DIED BUT REPAID ALL LOANS!";
     }
     if (player.health >= 0 && player.debt <= 0) {
-      result = 'YOU REPAID ALL LOANS!';
+      result = "YOU REPAID ALL LOANS!";
     }
     reason.innerText = result;
   }
@@ -339,8 +441,18 @@
       span.innerText = KARMA_LEVELS[cnt];
       if (!notInConditions) {
         span.style.color = conditions[cnt] ? "#fff" : "#000";
+        if (conditions[cnt] && KARMA_LEVELS[cnt] === "GOOD") {
+          SOUND_GOOD.play();
+        }
+        if (conditions[cnt] && KARMA_LEVELS[cnt] === "BUDDA") {
+          SOUND_BUDDA.play();
+        }
+        if (conditions[cnt] && ["BAD", "AVERAGE"].indexOf(KARMA_LEVELS[cnt]) > 0) {
+          SOUND_GAMEOVER.play();
+        }
       } else {
         if (cnt === 0) {
+          SOUND_GAMEOVER.play();
           span.style.color = "#fff";
         }
       }
@@ -441,7 +553,9 @@
         addCollectors();
         stats.debts_failed++;
       }
+      // successfully repaid a loan
       if (player.cash >= player.monthlyPay) {
+        SOUND_ADVANCE.play();
         player.cash -= player.monthlyPay;
         player.debt -= player.monthlyPay;
         if (player.debt > 0 && player.debt < player.monthlyPay) {
