@@ -7,11 +7,13 @@
   "license": "MIT",
   "dependencies": {},
   "scripts": {
-    "build": "cpx \"src/*.{html,css}\" \"dist/\" && cpx \"src/img/*\" \"dist/img/\" && cpx \"src/sound/*\" \"dist/sound/\" && minify src -d dist --mangle"
+    "build": "node build_script.js src dist",
+    "build_deprecated": "cp-cli \"src/*.{html,css}\" \"dist/\" && cp-cli \"src/img/*\" \"dist/img/\" && cp-cli \"src/sound/*\" \"dist/sound/\" && minify src -d dist --mangle"
   },
   "devDependencies": {
     "babel-minify": "^0.5.1",
     "babel-plugin-minify-mangle-names": "^0.5.0",
-    "cpx": "^1.5.0"
+    "fs-extra": "^9.0.0",
+    "klaw-sync": "^6.0.0"
   }
 }
