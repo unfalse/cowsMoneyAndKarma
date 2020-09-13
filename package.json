@@ -13,8 +13,6 @@
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
-    "babel-minify": "^0.5.1",
-    "babel-plugin-minify-mangle-names": "^0.5.0",
     "fs-extra": "^9.0.0",
     "klaw-sync": "^6.0.0",
     "uglify-js": "^3.10.4"
