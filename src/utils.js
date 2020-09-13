@@ -1,4 +1,4 @@
-Utils = {
+var Utils = {
     KEY_CODE: {
       LEFT: 37,
       UP: 38,

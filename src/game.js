@@ -479,7 +479,6 @@
     newDiv.style.left = x * CELLSIZE;
     newDiv.className = "game-object";
     newDiv.innerText = text;
-    newDiv.parentElement = gameFieldEl;
 
     if (type === CREDIT) {
       newDiv.className += " credit";
